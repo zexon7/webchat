@@ -1,6 +1,5 @@
 # webchat
-這是一個使用Socket.IO與Node.js製作的網頁聊天室
-=
+        這是一個使用Socket.IO與Node.js製作的網頁聊天室，主要提供即時的訊息回應
 安裝方法
 =
         安裝node.js https://nodejs.org/zh-cn/
@@ -14,3 +13,9 @@
         4.打開ngrok
         5.輸入 ngrok http 3000，建立伺服器
         6.在瀏覽器輸入http://localhost:3000/
+介面
+=
+![webchat](https://github.com/zexon7/webchat/blob/master/images/step5.jpg)
+![webchat](https://github.com/zexon7/webchat/blob/master/images/step6.jpg)
+![webchat](https://github.com/zexon7/webchat/blob/master/images/step8.jpg)
+![webchat](https://github.com/zexon7/webchat/blob/master/images/step9.jpg)
