@@ -1,0 +1,1 @@
+web: node a.js

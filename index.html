@@ -1,0 +1,156 @@
+<!doctype html>
+
+<!-- Compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Compiled and minified JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+window.onload = function(){
+	var socket = io();// connect to server on port 3000
+
+	//welcome
+	var welcome = document.getElementById('welcome');
+	var name = document.getElementById('name');
+	var btn = document.getElementById('join');
+
+	name.addEventListener('keypress',function(e){
+		if (event.keyCode === 13) {
+   		event.preventDefault();
+   		btn.click();
+  	}
+	});
+
+	btn.addEventListener('click', function(e){//when join get clicked
+		e.preventDefault();
+		if(name.value == ""){
+			alert("Invalid name")
+		}
+		else{
+			socket.emit('new-user', {username:name.value});
+			name.value = '';//clear input
+		}
+  });
+
+	socket.on('check-list', function(data){//check if name is already used
+		if(data.success){//if name not used
+			welcome.style.display = 'none';
+			main.style.display = 'inline';
+		}
+		else {
+			alert("Name is already used!");
+		}
+	});
+
+	socket.on('new-user', function(id){// show new user join the chat
+		chatform.innerHTML += '<p class="center-align"><b>' + id + '</b></p>';
+	});
+
+	socket.on('user-left', function(id){// show user left the chat
+		chatform.innerHTML += '<p class="center-align"><b>' + id + '</b></p>';
+	});
+
+
+	//main
+	var userList = document.getElementById('user-list');
+	var chatform = document.getElementById('chat');
+	var msg = document.getElementById('msg');
+	var send = document.getElementById('send');
+
+	socket.on('update-list',function(users){
+		userList.innerHTML = '';
+
+		users.forEach(function(user){//for each user in users, create a list element in html
+			var userLi = document.createElement('li');
+			userLi.innerHTML = '<h6 class="center collection-item">'+ user + '<i class = "material-icons left">person</i></h6>';
+			userList.insertBefore(userLi, userList.lastChild);
+		});
+	});
+
+	msg.addEventListener('keypress',function(e){
+		if (event.keyCode === 13) {
+   		event.preventDefault();
+   		send.click();
+  	}
+	});
+
+	send.addEventListener('click', function(e){
+		e.preventDefault();
+		socket.emit('new-msg', msg.value);
+		msg.value = '';//clear input
+  });
+
+	socket.on('new-msg', function(msg){
+		chatform.innerHTML += '<div class="collection-item">' + msg + '</div>';
+		chatform.scrollTop = chatform.scrollHeight;//update chatform
+	});
+
+}
+</script>
+
+<style>
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #40c4ff;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #0091ea;
+}
+
+</style>
+
+<html>
+  <head>
+    <title>webchat</title>
+  </head>
+
+	<body class="white">
+
+		<nav class="nav-wrapper light-blue accent-2">
+			<div class="brand-logo center black-text">webchat</div>
+		</nav>
+
+		<div id = "welcome" class="center-align card" style="margin:17%">
+			<input type = "text" id = "name" placeholder = "Enter your name!" class="center-align white" onKeypress="if(event.keyCode == 32)event.returnValue = false;">
+			<button id = "join" class="center-align waves-effect btn-large light-blue accent-2 black-text"><i class="material-icons right">chat</i>Join the chat!</button>
+		</div>
+
+		<div id="main" style = "display:none" class="row">
+
+			<div  class="col s8">
+				<div>
+					<div id ="chat" class="collection" style="border:2px solid #80d8ff; border-radius: 10px; margin:2%; height:500px; overflow:auto"></div>
+					<div class="card white" style="margin:2%;">
+						<input type = "text" id = "msg" class="center-align white" style="margin:2%; width:83%">
+						<button id = "send" class="right-align waves-effect btn light-blue accent-2 black-text">Send<i class = "material-icons right">send</i></button>
+					</div>
+				</div>
+			</div>
+
+			<div class="col s4 right-align">
+				<div class="center-align" >
+					<h4 class="black-text">Connected User</h4>
+					<ul id ="user-list" class="collection" style="height:550px; overflow:auto"></ul>
+				</div>
+			</div>
+
+		</div>
+  </body>
+
+</html>
